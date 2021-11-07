@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace FullDuplexServer.Models
 {
-    public class User
+    public class TokenServiceDto
     {
+        public TimeSpan DataLifeTime { get; set; }
+        public UserIdentity Identity { get; set; }
     }
 }
