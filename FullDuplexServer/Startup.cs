@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FullDuplexServer.Abstractions;
 using FullDuplexServer.Services;
+using FullDuplexServer.Controllers;
 
 namespace FullDuplexServer
 {
@@ -51,6 +52,7 @@ namespace FullDuplexServer
             services.AddAuthentication(AuthHandler.SCHEME)
                 .AddScheme<AuthHandlerOpt, AuthHandler>(AuthHandler.SCHEME, null);
 
+            services.AddSignalR();
             //services.AddAuthorization();
         }
 
@@ -72,6 +74,7 @@ namespace FullDuplexServer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<RestreamHub>("/stream");
             });
         }
     }

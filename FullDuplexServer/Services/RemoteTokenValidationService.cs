@@ -10,6 +10,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using FullDuplexServer.Models;
 using System.Security.Principal;
+using Mapster;
+using DuplexDomain.Dto.OAuth;
 
 namespace FullDuplexServer.Services
 {
@@ -57,21 +59,22 @@ namespace FullDuplexServer.Services
                 return null;
             }
 
-            var answer = JsonSerializer.Deserialize<TokenServiceDto>(responseContent);
+            var answer = JsonSerializer.Deserialize<OAuthIdentityResponseDto>(responseContent);
             if (answer is null)
             {
                 _logger.LogError($"recieved data from OAuth service ('{client.BaseAddress}') does not fit the model: '{responseContent}'");
                 return null;
             }
 
-            _cache.Set(token, answer.Identity, answer.DataLifeTime);
+            var answerIdentity = answer.Adapt<TokenServiceDto>();
+            _cache.Set(token, answerIdentity.Identity, answerIdentity.DataLifeTime);
 
-            return answer.Identity;
+            return answerIdentity.Identity;
         }
 
         private HttpRequestMessage CreateTokenValidationRequest(string token)
         {
-            var model = new { token };
+            var model = new OAuthIdentityRequestDto { Token = token };
             var serialized = JsonSerializer.Serialize(model);
             var content = new StringContent(serialized);
             var request = new HttpRequestMessage
